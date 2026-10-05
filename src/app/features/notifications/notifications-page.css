@@ -1,0 +1,110 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* Evita el hueco enorme en pantallas anchas */
+.notification-list {
+  width: 100%;
+  max-width: 52rem;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  border-radius: var(--radius-md);
+}
+
+/* Único indicador de no leído: franja ámbar a la izquierda */
+.notification-unread {
+  border-left-color: var(--primary);
+  background: linear-gradient(90deg, var(--primary-soft), var(--surface) 40%);
+}
+
+.notification-main {
+  display: grid;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.notification-task {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Leída: el título pierde peso, sin tocar la opacidad */
+.notification:not(.notification-unread) .notification-task {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.notification-detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Antigüedad / vencimiento con jerarquía propia */
+.notification-age {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.notification-overdue .notification-age {
+  color: var(--danger);
+}
+
+.notification-overdue .badge {
+  background: var(--danger);
+  color: var(--text-inverse);
+  font-weight: 700;
+  border: 0;
+}
+
+.notification:not(.notification-overdue) .badge {
+  background: transparent;
+  border: 1px solid var(--ring);
+  color: var(--ring);
+  font-weight: 700;
+}
+
+/* Acciones agrupadas a la derecha, separadas por una línea */
+.notification-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--border);
+}
+
+@media (max-width: 700px) {
+  .notification {
+    flex-wrap: wrap;
+  }
+
+  .notification-actions {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    padding-top: var(--space-2);
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+}

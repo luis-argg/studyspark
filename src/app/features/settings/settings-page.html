@@ -1,0 +1,184 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Ajustes</h1>
+      <p class="page-subtitle">Todo se guarda solo en este navegador. Nada sale de tu equipo.</p>
+    </div>
+  </div>
+
+  @if (message(); as text) {
+    <p class="card notice" role="status">{{ text }}</p>
+  }
+
+  <!-- BLOQUE 1: Organización del estudio -->
+  <div class="group">
+    <h2 class="group-title">Organización del estudio</h2>
+
+    <!-- Materias -->
+    <section class="card panel">
+      <header class="panel-header">
+        <div>
+          <h3 class="panel-title">Materias</h3>
+          <p class="panel-hint">
+            Se usan para clasificar tareas y apuntes. Al borrar una, sus elementos quedan sin
+            materia.
+          </p>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" (click)="openCreate()">
+          <span aria-hidden="true">+</span> Nueva materia
+        </button>
+      </header>
+
+      @if (subjectsStore.subjects().length === 0) {
+        <app-empty-state
+          icon="◇"
+          title="Sin materias"
+          text="Crea tus asignaturas para organizar el trabajo por asignatura."
+        >
+          <button type="button" class="btn btn-primary" (click)="openCreate()">
+            Crear la primera
+          </button>
+        </app-empty-state>
+      } @else {
+        <ul class="stack">
+          @for (subject of subjectsStore.subjects(); track subject.id) {
+            <li class="subject">
+              <span class="dot" [style.background]="subject.color" aria-hidden="true"></span>
+
+              <div class="subject-main">
+                <p class="subject-name">{{ subject.name }}</p>
+                <p class="subject-meta">{{ usageOf(subject.id) }} elementos</p>
+              </div>
+
+              <div class="subject-actions">
+                <button
+                  type="button"
+                  class="btn btn-secondary btn-sm"
+                  (click)="openEdit(subject)"
+                  [attr.aria-label]="'Editar ' + subject.name"
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  (click)="remove(subject)"
+                  [attr.aria-label]="'Eliminar ' + subject.name"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <!-- Apariencia -->
+    <section class="card panel">
+      <header class="panel-header">
+        <div>
+          <h3 class="panel-title">Apariencia</h3>
+          <p class="panel-hint">Elige cómo se ve StudySpark.</p>
+        </div>
+      </header>
+
+      <div class="theme-options" role="radiogroup" aria-label="Tema de la interfaz">
+        @for (option of themeOptions; track option.value; let i = $index) {
+          <button
+            type="button"
+            role="radio"
+            class="theme-option"
+            [class.theme-option-active]="theme.current() === option.value"
+            [attr.aria-checked]="theme.current() === option.value"
+            [attr.tabindex]="selectedThemeIndex() === i ? 0 : -1"
+            (click)="setTheme(option.value)"
+            (keydown)="onThemeKey($event, i)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- BLOQUE 2: Gestión de datos -->
+  <div class="group group-data">
+    <h2 class="group-title">Gestión de datos</h2>
+
+    <!-- Datos -->
+    <section class="card panel">
+      <header class="panel-header">
+        <div>
+          <h3 class="panel-title">Tus datos</h3>
+          <p class="panel-hint">
+            {{ stats().tasks }} tareas · {{ stats().notes }} apuntes · {{ stats().subjects }}
+            materias
+          </p>
+        </div>
+      </header>
+
+      <div class="panel-actions">
+        <button type="button" class="btn btn-secondary" (click)="loadSeed()">
+          Cargar datos de ejemplo
+        </button>
+      </div>
+
+      <div class="danger-zone">
+        <div>
+          <p class="danger-title">Zona de peligro</p>
+          <p class="danger-text">
+            Borra tareas, apuntes y materias de este navegador. No se puede deshacer.
+          </p>
+        </div>
+        <button type="button" class="btn btn-danger" (click)="askClear()">Borrar todo</button>
+      </div>
+    </section>
+
+    <!-- Respaldo -->
+    <section class="card panel">
+      <header class="panel-header">
+        <div>
+          <h3 class="panel-title">Respaldo</h3>
+          <p class="panel-hint">
+            Descarga un archivo JSON para cambiar de dispositivo o guardar una copia. Al importar se
+            reemplaza el contenido actual.
+          </p>
+        </div>
+      </header>
+
+      <div class="panel-actions">
+        <button type="button" class="btn btn-secondary" (click)="exportBackup()">
+          Descargar respaldo
+        </button>
+
+        <label class="btn btn-secondary file-label">
+          Importar respaldo
+          <input
+            type="file"
+            class="sr-only"
+            accept="application/json,.json"
+            (change)="importBackup($event)"
+          />
+        </label>
+      </div>
+    </section>
+  </div>
+
+  <app-subject-form
+    [open]="formOpen()"
+    [subject]="editing()"
+    (closed)="closeForm()"
+    (saved)="save($event)"
+  />
+
+  <app-confirm-dialog
+    [open]="confirmOpen()"
+    [title]="confirmTitle()"
+    [message]="confirmMessage()"
+    [confirmLabel]="confirmLabel()"
+    [tone]="pending()?.kind === 'clear' || pending()?.kind === 'subject' ? 'danger' : 'primary'"
+    (confirmed)="confirmAction()"
+    (closed)="closeConfirm()"
+  />
+</section>

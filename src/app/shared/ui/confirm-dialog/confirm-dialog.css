@@ -1,0 +1,11 @@
+.confirm {
+  width: min(26rem, calc(100vw - 2rem));
+}
+
+.confirm-danger {
+  border-color: var(--danger);
+}
+
+.confirm-danger .dialog-title {
+  color: var(--danger);
+}

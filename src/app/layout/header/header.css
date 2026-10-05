@@ -1,0 +1,133 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20; /* por debajo del scrim (25) y del sidebar (30) */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: var(--header-height);
+  padding: 0 2rem;
+  background: #0d0c0c;
+  border-top: 4px solid #f0c348;
+  border-bottom: 1px solid rgb(209 207 207 / 0.15);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 700;
+  color: #f0c348;
+  text-decoration: none;
+}
+
+.brand-mark {
+  font-size: 1rem;
+  font-style: normal;
+}
+
+.header-date {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 1px solid rgb(209 207 207 / 0.25);
+  font-size: 0.85rem;
+  color: #d1cfcf;
+  text-transform: capitalize;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.menu-toggle,
+.icon-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgb(209 207 207 / 0.3);
+  border-radius: 10px;
+  color: #d1cfcf;
+  font-size: 1.15rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background-color 0.15s;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.menu-toggle:hover,
+.icon-button:hover {
+  border-color: #f0c348;
+  color: #f0c348;
+  background: rgb(240 195 72 / 0.08);
+}
+
+.brand:focus-visible,
+.menu-toggle:focus-visible,
+.icon-button:focus-visible {
+  outline: 2px solid #f0c348;
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.icon-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 1.15rem;
+  padding: 0 0.3rem;
+  background: #f0c348;
+  border: 2px solid #0d0c0c;
+  border-radius: 999px;
+  color: #0d0c0c;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1rem;
+  text-align: center;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #f0c348;
+  border-radius: 50%;
+  color: #0d0c0c;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding: 0 1rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-date {
+    display: none;
+  }
+}

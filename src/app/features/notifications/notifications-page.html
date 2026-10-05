@@ -1,0 +1,85 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Notificaciones</h1>
+      <p class="page-subtitle">
+        Avisos de tareas vencidas y de las que vencen hoy. Se generan en tu navegador, sin
+        servidores.
+      </p>
+    </div>
+
+    @if (hasUnread()) {
+      <div class="toolbar">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="markAllRead()">
+          Marcar leídas
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="dismissAll()">
+          Descartar todo
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (isEmpty()) {
+    <app-empty-state
+      icon="◔"
+      title="Nada que reclamar"
+      text="Cuando tengas una tarea vencida o que venza hoy, aparecerá aquí como recordatorio."
+    >
+      <a routerLink="/tareas" class="btn btn-primary">Ir a mis tareas</a>
+    </app-empty-state>
+  } @else {
+    <ul class="stack notification-list">
+      @for (notification of notifications(); track notification.id) {
+        @let task = taskOf(notification.taskId);
+
+        <li
+          class="card notification"
+          [class.notification-unread]="!notification.read"
+          [class.notification-overdue]="notification.kind === 'overdue'"
+        >
+          <div class="notification-main">
+            <div class="notification-head">
+              <span
+                class="badge"
+                [class.badge-danger]="notification.kind === 'overdue'"
+                [class.badge-warning]="notification.kind === 'today'"
+              >
+                {{ labels[notification.kind] }}
+              </span>
+              <span class="notification-task">{{ notification.taskTitle }}</span>
+            </div>
+
+            <p class="notification-detail">
+              <span class="chip" [style.--chip-color]="subjectColor(task?.subjectId ?? null)">
+                {{ subjectName(task?.subjectId ?? null) }}
+              </span>
+
+              @if (notification.kind === 'overdue') {
+                <span>Venció {{ dueLabel(notification.dueDate) }}</span>
+                <span class="notification-age">
+                  hace {{ daysLate(notification.dueDate) }}
+                  {{ daysLate(notification.dueDate) === 1 ? 'día' : 'días' }}
+                </span>
+              } @else {
+                <span class="notification-age">Vence {{ dueLabel(notification.dueDate) }}</span>
+              }
+            </p>
+          </div>
+
+          <div class="notification-actions">
+            <a routerLink="/tareas" class="btn btn-secondary btn-sm">Ver tarea</a>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              (click)="dismiss(notification.taskId)"
+              [attr.aria-label]="'Descartar el aviso de ' + notification.taskTitle"
+            >
+              Descartar
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

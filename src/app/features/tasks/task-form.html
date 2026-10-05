@@ -1,0 +1,77 @@
+<dialog
+  #dialog
+  class="dialog"
+  (close)="closed.emit()"
+  (cancel)="$event.preventDefault(); closed.emit()"
+>
+  <form class="dialog-panel" [formGroup]="form" (ngSubmit)="submit()">
+    <header class="dialog-header">
+      <h2 class="dialog-title">{{ task() ? 'Editar tarea' : 'Nueva tarea' }}</h2>
+      <p class="dialog-text">Se guarda en este navegador al instante.</p>
+    </header>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="field-label" for="task-title">Título</label>
+        <input
+          id="task-title"
+          type="text"
+          class="input"
+          formControlName="title"
+          placeholder="Ej. Entregar el ensayo"
+          autocomplete="off"
+          [class.input-invalid]="hasTitleError"
+        />
+        @if (hasTitleError) {
+          <p class="form-error">Ponle un título de entre 1 y 120 caracteres.</p>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label" for="task-subject">Materia</label>
+          <select id="task-subject" class="select" formControlName="subjectId">
+            @for (option of subjects(); track option.id) {
+              <option [ngValue]="option.id">{{ option.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="task-priority">Prioridad</label>
+          <select id="task-priority" class="select" formControlName="priority">
+            @for (option of priorities; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="task-due">Fecha límite</label>
+        <input
+          id="task-due"
+          type="date"
+          class="input"
+          formControlName="dueDate"
+          [class.input-invalid]="hasDueDateError"
+        />
+        @if (hasDueDateError) {
+          <p class="form-error">Indica una fecha límite.</p>
+        }
+      </div>
+    </div>
+
+    <footer class="dialog-footer">
+      @if (task()) {
+        <button type="button" class="btn btn-ghost btn-sm btn-delete" (click)="remove()">
+          Eliminar
+        </button>
+      }
+      <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">
+        {{ task() ? 'Guardar cambios' : 'Crear tarea' }}
+      </button>
+    </footer>
+  </form>
+</dialog>

@@ -1,0 +1,22 @@
+<app-header (menuToggle)="toggleMenu()" />
+
+<div class="body">
+  @if (menuOpen()) {
+    <button
+      type="button"
+      class="scrim"
+      (click)="closeMenu()"
+      aria-label="Cerrar menú de navegación"
+    ></button>
+  }
+
+  <app-sidebar [open]="menuOpen()" (closed)="closeMenu()" />
+
+  <main class="content">
+    <div class="content-inner">
+      <router-outlet />
+    </div>
+
+    <app-footer />
+  </main>
+</div>

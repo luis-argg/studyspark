@@ -1,0 +1,81 @@
+<dialog
+  #dialog
+  class="dialog"
+  (close)="closed.emit()"
+  (cancel)="$event.preventDefault(); closed.emit()"
+>
+  <form class="dialog-panel" [formGroup]="form" (ngSubmit)="submit()">
+    <header class="dialog-header">
+      <h2 class="dialog-title">{{ note() ? 'Editar apunte' : 'Nuevo apunte' }}</h2>
+      <p class="dialog-text">El cuerpo admite texto plano y saltos de línea.</p>
+    </header>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="field-label" for="note-title">Título</label>
+        <input
+          id="note-title"
+          type="text"
+          class="input"
+          formControlName="title"
+          placeholder="Ej. Integrales por partes"
+          autocomplete="off"
+          [class.input-invalid]="hasTitleError"
+        />
+        @if (hasTitleError) {
+          <p class="form-error">Ponle un título de entre 1 y 80 caracteres.</p>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label" for="note-subject">Materia</label>
+          <select id="note-subject" class="select" formControlName="subjectId">
+            @for (option of subjects(); track option.id) {
+              <option [ngValue]="option.id">{{ option.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="note-tags">Etiquetas</label>
+          <input
+            id="note-tags"
+            type="text"
+            class="input"
+            formControlName="tags"
+            placeholder="cálculo, parcial"
+            autocomplete="off"
+          />
+          <p class="field-hint">Separadas por coma.</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="note-body">Contenido</label>
+        <textarea
+          id="note-body"
+          class="textarea"
+          formControlName="body"
+          placeholder="Escribe aquí tu apunte…"
+          [class.input-invalid]="hasBodyError"
+        ></textarea>
+        @if (hasBodyError) {
+          <p class="form-error">El apunte no puede estar vacío.</p>
+        }
+      </div>
+
+      <label class="check-row">
+        <input type="checkbox" class="checkbox-input" formControlName="pinned" />
+        <span>Fijar arriba en la lista</span>
+      </label>
+    </div>
+
+    <footer class="dialog-footer">
+      <button type="button" class="btn btn-secondary" (click)="closed.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">
+        {{ note() ? 'Guardar cambios' : 'Crear apunte' }}
+      </button>
+    </footer>
+  </form>
+</dialog>

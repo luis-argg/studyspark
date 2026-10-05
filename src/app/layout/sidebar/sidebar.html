@@ -1,0 +1,31 @@
+<aside id="sidebar" class="sidebar">
+  <nav aria-label="Secciones">
+    @for (section of sections; track section.heading) {
+      <p class="nav-heading">{{ section.heading }}</p>
+
+      <ul class="nav-list">
+        @for (item of section.items; track item.path) {
+          <li>
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="nav-link-active"
+              class="nav-link"
+              (click)="closed.emit()"
+            >
+              <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+              <span class="nav-text">
+                <span class="nav-label">{{ item.label }}</span>
+                <span class="nav-description">{{ item.description }}</span>
+              </span>
+              @if (item.path === notificationsPath && unreadCount() > 0) {
+                <span class="nav-count">{{ unreadCount() }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </nav>
+
+  <p class="storage-note">Tus datos se guardan solo en este navegador.</p>
+</aside>

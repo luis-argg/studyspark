@@ -1,0 +1,130 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Calendario</h1>
+      <p class="page-subtitle">
+        Fechas límite de tus tareas. Selecciona un día para ver su detalle.
+      </p>
+    </div>
+
+    <div class="toolbar">
+      <a routerLink="/tareas" class="btn btn-primary">
+        <span aria-hidden="true">+</span> Nueva tarea
+      </a>
+    </div>
+  </div>
+
+  <div class="card calendar">
+    <header class="toolbar calendar-toolbar">
+      <button type="button" class="btn btn-secondary btn-sm" (click)="previousMonth()">
+        <span aria-hidden="true">‹</span> Anterior
+      </button>
+
+      <h2 class="calendar-month">{{ monthTitle() }}</h2>
+
+      <div class="toolbar">
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm"
+          (click)="goToToday()"
+          [disabled]="isAtCurrentMonth()"
+        >
+          Hoy
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="nextMonth()">
+          Siguiente <span aria-hidden="true">›</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="grid" role="grid" [attr.aria-label]="monthTitle()">
+      <div class="weekdays" role="row">
+        @for (label of weekdays; track label) {
+          <span class="weekday" role="columnheader">{{ label }}</span>
+        }
+      </div>
+
+      <div class="days" role="rowgroup">
+        @for (day of days(); track day.iso) {
+          <button
+            type="button"
+            role="gridcell"
+            class="day"
+            [class.day-outside]="!day.inCurrentMonth"
+            [class.day-today]="day.isToday"
+            [class.day-selected]="day.iso === selectedDay()"
+            [attr.aria-current]="day.isToday ? 'date' : null"
+            [attr.aria-selected]="day.iso === selectedDay()"
+            (click)="selectDay(day.iso)"
+          >
+            <span class="day-number">{{ day.dayOfMonth }}</span>
+            @if (countFor(day.iso) > 0) {
+              <span
+                class="day-dots"
+                role="img"
+                [class.day-dots-overdue]="hasOverdueOn(day.iso)"
+                [attr.aria-label]="countFor(day.iso) + ' tareas'"
+              >
+                <span class="dot-mark"></span>
+                @if (countFor(day.iso) > 1) {
+                  <span class="dot-mark"></span>
+                }
+                @if (countFor(day.iso) > 2) {
+                  <span class="dot-mark"></span>
+                }
+                @if (countFor(day.iso) > 3) {
+                  <span class="dots-more" aria-hidden="true">+</span>
+                }
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <section class="agenda">
+    <header class="agenda-header">
+      <h2 class="agenda-title">{{ selectedDayTitle() }}</h2>
+      <span class="agenda-count">
+        {{ selectedTasks().length }} tarea{{ selectedTasks().length === 1 ? '' : 's' }}
+      </span>
+    </header>
+
+    @if (selectedIsEmpty()) {
+      <app-empty-state
+        icon="▦"
+        title="Sin tareas para este día"
+        text="Elige otra fecha en el calendario o crea una tarea con esa fecha límite."
+      >
+        <a routerLink="/tareas" class="btn btn-secondary">Ir a mis tareas</a>
+      </app-empty-state>
+    } @else {
+      <ul class="stack">
+        @for (task of selectedTasks(); track task.id) {
+          <li class="card agenda-item">
+            <span
+              class="dot"
+              [style.background]="subjectColor(task.subjectId)"
+              aria-hidden="true"
+            ></span>
+
+            <div class="agenda-main">
+              <p class="agenda-title-text">{{ task.title }}</p>
+              <p class="agenda-meta">
+                {{ subjectName(task.subjectId) }} ·
+                {{ isPending(task.status) ? 'Pendiente' : 'Completada' }}
+              </p>
+            </div>
+
+            @if (!isPending(task.status)) {
+              <span class="badge badge-success">Hecho</span>
+            } @else if (isOverdue(task.dueDate)) {
+              <span class="badge badge-danger">Vencida</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</section>

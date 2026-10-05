@@ -1,0 +1,183 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Apuntes</h1>
+      <p class="page-subtitle">Tus notas de clase, ordenadas y buscables.</p>
+    </div>
+
+    <button type="button" class="btn btn-primary" (click)="openCreate()">
+      <span aria-hidden="true">+</span> Nuevo apunte
+    </button>
+  </div>
+
+  <div class="card filters">
+    <div class="field">
+      <label class="field-label" for="notes-search">Buscar</label>
+      <input
+        id="notes-search"
+        type="search"
+        class="input"
+        placeholder="Busca en título y contenido…"
+        [value]="text()"
+        (input)="onText($event)"
+      />
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="notes-subject">Materia</label>
+      <select
+        id="notes-subject"
+        class="select"
+        [value]="subjectValue()"
+        (change)="onSubject($event)"
+      >
+        <option [value]="allSubjectsValue">Todas</option>
+        @for (option of subjects(); track option.id) {
+          <option [value]="option.id ?? noSubjectValue">{{ option.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (hasFilters()) {
+      <button type="button" class="btn btn-ghost btn-sm" (click)="clearFilters()">Limpiar</button>
+    }
+  </div>
+
+  @if (tags().length > 0) {
+    <div class="toolbar">
+      <span class="field-label">Etiquetas</span>
+      @for (item of tags(); track item) {
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-primary]="tag() === item"
+          [class.btn-secondary]="tag() !== item"
+          [attr.aria-pressed]="tag() === item"
+          (click)="onTag(item)"
+        >
+          #{{ item }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (isEmpty()) {
+    <app-empty-state
+      icon="✎"
+      title="Sin apuntes todavía"
+      text="Crea tu primer apunte para tener el temario de cada materia a mano."
+    >
+      <button type="button" class="btn btn-primary" (click)="openCreate()">Crear apunte</button>
+    </app-empty-state>
+  } @else if (results().length === 0) {
+    <app-empty-state
+      icon="⌕"
+      title="Ningún apunte coincide"
+      text="Prueba con otra búsqueda o quita los filtros activos."
+    >
+      <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+        Quitar filtros
+      </button>
+    </app-empty-state>
+  } @else {
+    <p class="result-count">{{ results().length }} apuntes</p>
+
+    <ul class="stack">
+      @for (note of results(); track note.id) {
+        <li class="card note" [class.note-pinned]="note.pinned">
+          <div class="note-open">
+            <div class="note-head">
+              @if (note.pinned) {
+                <span class="badge badge-pinned" aria-label="Fijado">★ Fijado</span>
+              }
+              <h2 class="note-title">{{ note.title }}</h2>
+            </div>
+
+            <p class="note-meta">
+              <span class="chip" [style.--chip-color]="subjectsStore.colorOf(note.subjectId)">
+                {{ subjectsStore.nameOf(note.subjectId) }}
+              </span>
+              <span>Actualizado {{ updatedLabel(note) }}</span>
+            </p>
+
+            @if (isExpanded(note.id)) {
+              <p class="note-body" [id]="'note-body-' + note.id">{{ note.body }}</p>
+            } @else {
+              <p class="note-excerpt">{{ excerpt(note.body) }}</p>
+            }
+
+            @if (note.tags.length > 0) {
+              <p class="note-tags">
+                @for (item of note.tags; track item) {
+                  <span class="tag">#{{ item }}</span>
+                }
+              </p>
+            }
+
+            <button
+              type="button"
+              class="note-toggle"
+              [attr.aria-expanded]="isExpanded(note.id)"
+              [attr.aria-controls]="'note-body-' + note.id"
+              (click)="toggleExpanded(note.id)"
+            >
+              {{ isExpanded(note.id) ? 'Ver menos' : 'Leer completo' }}
+            </button>
+          </div>
+
+          <div class="note-actions">
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              (click)="togglePin(note)"
+              [attr.aria-pressed]="note.pinned"
+              [attr.aria-label]="
+                note.pinned ? 'Dejar de fijar ' + note.title : 'Fijar ' + note.title
+              "
+            >
+              {{ note.pinned ? 'Desfijar' : 'Fijar' }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              (click)="openEdit(note)"
+              [attr.aria-label]="'Editar ' + note.title"
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm btn-delete"
+              (click)="remove(note)"
+              [attr.aria-label]="'Eliminar ' + note.title"
+            >
+              Eliminar
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (!isEmpty()) {
+    <p class="hint">Pulsa «Leer completo» para ver un apunte entero.</p>
+  }
+
+  <app-note-form
+    [open]="formOpen()"
+    [note]="editing()"
+    [subjects]="subjects()"
+    (closed)="closeForm()"
+    (saved)="save($event)"
+  />
+
+  <app-confirm-dialog
+    [open]="confirmOpen()"
+    title="¿Eliminar el apunte?"
+    [message]="confirmMessage()"
+    confirmLabel="Eliminar apunte"
+    tone="danger"
+    (confirmed)="confirmDelete()"
+    (closed)="closeConfirm()"
+  />
+</section>

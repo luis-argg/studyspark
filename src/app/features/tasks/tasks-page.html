@@ -1,0 +1,174 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tareas</h1>
+      <p class="page-subtitle">
+        @if (tasksStore.overdueCount() > 0) {
+          <span class="overdue-inline">
+            {{ tasksStore.overdueCount() }} vencida{{ tasksStore.overdueCount() === 1 ? '' : 's' }}
+            ·
+          </span>
+        }
+        {{ tasksStore.pendingCount() }} pendiente{{ tasksStore.pendingCount() === 1 ? '' : 's' }} ·
+        {{ tasksStore.completedCount() }} completada{{
+          tasksStore.completedCount() === 1 ? '' : 's'
+        }}
+      </p>
+    </div>
+
+    <div class="toolbar">
+      @if (tasksStore.completedCount() > 0) {
+        <button type="button" class="btn btn-ghost btn-sm" (click)="clearCompleted()">
+          Limpiar completadas
+        </button>
+      }
+      <button type="button" class="btn btn-primary" (click)="openCreate()">
+        <span aria-hidden="true">+</span> Nueva tarea
+      </button>
+    </div>
+  </div>
+
+  <div class="filters card">
+    <div class="field grow">
+      <label class="field-label" for="task-search">Buscar</label>
+      <input
+        id="task-search"
+        type="search"
+        class="input"
+        placeholder="Busca por título"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="task-filter-status">Estado</label>
+      <select
+        id="task-filter-status"
+        class="select"
+        [value]="statusFilter()"
+        (change)="setStatus($any($event.target).value)"
+      >
+        @for (option of statuses; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="task-filter-priority">Prioridad</label>
+      <select
+        id="task-filter-priority"
+        class="select"
+        [value]="priorityFilter()"
+        (change)="setPriority($any($event.target).value)"
+      >
+        @for (option of priorities; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="task-filter-subject">Materia</label>
+      <select
+        id="task-filter-subject"
+        class="select"
+        [value]="subjectFilter()"
+        (change)="setSubject($any($event.target).value)"
+      >
+        <option value="all">Todas</option>
+        @for (option of subjects(); track option.id) {
+          <option [value]="option.id ?? 'none'">{{ option.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (hasActiveFilters()) {
+      <button type="button" class="btn btn-ghost btn-sm" (click)="resetFilters()">Limpiar</button>
+    }
+  </div>
+
+  @if (filteredCount() > 0) {
+    <ul class="task-list">
+      @for (task of visible(); track task.id) {
+        <li class="card task" [class.task-done]="task.status === 'done'">
+          <button
+            type="button"
+            class="checkbox"
+            [class.checkbox-checked]="task.status === 'done'"
+            (click)="toggle(task)"
+            [attr.aria-pressed]="task.status === 'done'"
+            [attr.aria-label]="
+              task.status === 'done' ? 'Marcar como pendiente' : 'Marcar como completada'
+            "
+          >
+            <span aria-hidden="true">✓</span>
+          </button>
+
+          <button type="button" class="task-open" (click)="openEdit(task)">
+            <span class="task-title">{{ task.title }}</span>
+
+            <span class="task-meta">
+              <span class="chip" [style.--chip-color]="subjectColor(task.subjectId)">
+                {{ subjectName(task.subjectId) }}
+              </span>
+              @if (!isOverdue(task) && !isDueToday(task)) {
+                <span class="badge badge-info">Vence {{ dueLabel(task.dueDate) }}</span>
+              }
+              <span
+                class="badge"
+                [class.badge-priority-high]="task.priority === 'high'"
+                [class.badge-priority-medium]="task.priority === 'medium'"
+                [class.badge-priority-low]="task.priority === 'low'"
+              >
+                {{ priorityLabels[task.priority] }}
+              </span>
+              @if (isOverdue(task)) {
+                <span class="badge badge-danger">Vencida</span>
+              } @else if (isDueToday(task)) {
+                <span class="badge badge-warning">Para hoy</span>
+              }
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  } @else if (isEmpty()) {
+    <app-empty-state
+      icon="✓"
+      title="Todavía no hay tareas"
+      text="Crea tu primera tarea con materia, prioridad y fecha límite. Se guarda en este navegador al instante."
+    >
+      <button type="button" class="btn btn-primary" (click)="openCreate()">
+        Crear mi primera tarea
+      </button>
+    </app-empty-state>
+  } @else {
+    <app-empty-state
+      icon="⌕"
+      title="Ninguna tarea coincide con los filtros"
+      text="Prueba con otro estado, prioridad, materia o término de búsqueda."
+    >
+      <button type="button" class="btn btn-secondary" (click)="resetFilters()">
+        Limpiar filtros
+      </button>
+    </app-empty-state>
+  }
+
+  @if (hasNoSubjects()) {
+    <p class="hint">
+      Sin materias registradas: el filtro por asignatura solo ofrecerá «Sin materia».
+      <a routerLink="/ajustes">Crea las tuyas en Ajustes</a>.
+    </p>
+  }
+</section>
+
+<app-task-form
+  [open]="formOpen()"
+  [task]="editing()"
+  [subjects]="subjects()"
+  (saved)="save($event)"
+  (closed)="closeForm()"
+  (deleted)="remove($event)"
+/>

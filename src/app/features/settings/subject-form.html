@@ -1,0 +1,58 @@
+<dialog
+  #dialog
+  class="dialog"
+  (close)="closed.emit()"
+  (cancel)="$event.preventDefault(); closed.emit()"
+>
+  <form class="dialog-panel" [formGroup]="form" (ngSubmit)="submit()">
+    <header class="dialog-header">
+      <h2 class="dialog-title">{{ subject() ? 'Editar materia' : 'Nueva materia' }}</h2>
+      <p class="dialog-text">El color identifica la asignatura en listas y calendario.</p>
+    </header>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="field-label" for="subject-name">Nombre</label>
+        <input
+          id="subject-name"
+          type="text"
+          class="input"
+          formControlName="name"
+          placeholder="Ej. Matemáticas"
+          autocomplete="off"
+          [class.input-invalid]="hasNameError"
+        />
+        @if (hasNameError) {
+          <p class="form-error">Ponle un nombre de entre 1 y 40 caracteres.</p>
+        }
+      </div>
+
+      <div class="field">
+        <span class="field-label" id="subject-color-label">Color</span>
+        <div class="swatches" role="radiogroup" aria-labelledby="subject-color-label">
+          @for (color of palette; track color; let i = $index) {
+            <button
+              type="button"
+              role="radio"
+              class="swatch"
+              [class.swatch-active]="selectedColor() === color"
+              [style.background]="color"
+              [attr.aria-checked]="selectedColor() === color"
+              [attr.tabindex]="selectedColorIndex() === i ? 0 : -1"
+              [attr.aria-label]="color"
+              (click)="pickColor(color)"
+              (keydown)="onColorKey($event, i)"
+            ></button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <footer class="dialog-footer">
+      <button type="button" class="btn btn-secondary" (click)="closed.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">
+        {{ subject() ? 'Guardar cambios' : 'Crear materia' }}
+      </button>
+    </footer>
+  </form>
+</dialog>
