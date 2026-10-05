@@ -31,6 +31,18 @@ export class StorageService {
     return parsed as T;
   }
 
+  /**
+   * Si la clave existe. Distingue "nunca se guardó" de "se guardó vacío", algo
+   * que `read` no puede expresar porque en ambos casos devuelve el fallback.
+   */
+  has(key: string): boolean {
+    try {
+      return this.storage()?.getItem(key) != null;
+    } catch {
+      return false;
+    }
+  }
+
   write<T>(key: string, value: T): boolean {
     try {
       this.storage()?.setItem(key, JSON.stringify(value));

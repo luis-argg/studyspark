@@ -19,9 +19,12 @@ export class SeedService {
   private readonly subjects = inject(SubjectsStore);
   private readonly notifications = inject(NotificationsStore);
 
-  readonly isEmpty = computed(
-    () => this.tasks.totalCount() === 0 && this.notes.count() === 0 && this.subjects.count() === 0,
-  );
+  /**
+   * Si no hay nada que cargar. Las materias no cuentan: son taxonomía y siempre
+   * hay, así que en el primer arranque la app ya trae las 15 básicas pero sigue
+   * siendo "vacía" y `loadSeed()` puede saltarse la confirmación.
+   */
+  readonly isEmpty = computed(() => this.tasks.totalCount() === 0 && this.notes.count() === 0);
 
   load(): void {
     const data = buildSeedData();

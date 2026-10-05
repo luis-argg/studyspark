@@ -506,6 +506,13 @@ a:hover {
 .dialog {
   width: min(32rem, calc(100vw - 2rem));
   padding: 0;
+  /* El navegador centra el <dialog> modal con `margin: auto`, pero el reset de
+     arriba declara `* { margin: 0 }` y el origen autor siempre gana al del
+     navegador: sin esto el diálogo queda pegado a la esquina superior izquierda. */
+  margin: auto;
+  /* El modal de apuntes es alto; en pantallas bajas `max-height` del UA cortaba
+     el footer en vez de dejar desplazar el contenido. */
+  overflow: auto;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);

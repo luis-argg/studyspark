@@ -1,5 +1,6 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 
+import { createDefaultSubjects } from '../dev/default-subjects';
 import type { Subject, SubjectDraft } from '../models/subject';
 import { STORAGE_KEYS } from '../models/storage-key';
 import { isSubject } from '../storage/entity-guards';
@@ -20,9 +21,18 @@ export interface SubjectOption {
 export class SubjectsStore {
   private readonly storage = inject(StorageService);
 
-  private readonly state = signal<Subject[]>(
-    this.storage.read(STORAGE_KEYS.subjects, [], isSubject),
-  );
+  private readonly state = signal<Subject[]>(this.initialSubjects());
+
+  /**
+   * En el primer arranque no hay nada guardado, así que se siembran las materias
+   * básicas. Una clave existente gana siempre, incluso si vale `[]`: si la
+   * persona borró todas, no deben reaparecer solas en la siguiente visita.
+   */
+  private initialSubjects(): Subject[] {
+    return this.storage.has(STORAGE_KEYS.subjects)
+      ? this.storage.read<Subject[]>(STORAGE_KEYS.subjects, [], isSubject)
+      : createDefaultSubjects();
+  }
 
   readonly subjects = this.state.asReadonly();
 

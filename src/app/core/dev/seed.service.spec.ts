@@ -4,6 +4,7 @@ import { NotesStore } from '../stores/notes.store';
 import { SubjectsStore } from '../stores/subjects.store';
 import { TasksStore } from '../stores/tasks.store';
 import { todayIso } from '../utils/date';
+import { DEFAULT_SUBJECTS } from './default-subjects';
 import { SeedService } from './seed.service';
 
 describe('SeedService', () => {
@@ -36,6 +37,18 @@ describe('SeedService', () => {
     expect(notes.count()).toBeGreaterThan(0);
   });
 
+  it('keeps the basic subjects instead of swapping them for a demo set', () => {
+    seed.load();
+
+    expect(subjects.subjects()).toEqual(DEFAULT_SUBJECTS);
+  });
+
+  /** Las materias básicas no cuentan como datos: el arranque sigue "vacío". */
+  it('reports empty state even though the basic subjects are seeded', () => {
+    expect(subjects.count()).toBe(DEFAULT_SUBJECTS.length);
+    expect(seed.isEmpty()).toBe(true);
+  });
+
   it('only links tasks and notes to existing subjects', () => {
     seed.load();
 
@@ -63,7 +76,7 @@ describe('SeedService', () => {
     seed.load();
 
     expect(tasks.totalCount()).toBe(first);
-    expect(subjects.count()).toBe(4);
+    expect(subjects.count()).toBe(DEFAULT_SUBJECTS.length);
   });
 
   it('replaces whatever was there before', () => {

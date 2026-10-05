@@ -2,19 +2,13 @@ import type { Note } from '../models/note';
 import type { Subject } from '../models/subject';
 import type { Task, TaskPriority } from '../models/task';
 import { addDays, todayIso } from '../utils/date';
+import { createDefaultSubjects } from './default-subjects';
 
 export interface SeedData {
   readonly subjects: Subject[];
   readonly tasks: Task[];
   readonly notes: Note[];
 }
-
-const SUBJECTS: readonly Subject[] = [
-  { id: 'seed-mat', name: 'Matemáticas', color: '#4f46e5' },
-  { id: 'seed-prog', name: 'Programación', color: '#0369a1' },
-  { id: 'seed-hist', name: 'Historia', color: '#b45309' },
-  { id: 'seed-fis', name: 'Física', color: '#15803d' },
-];
 
 interface TaskSeed {
   readonly id: string;
@@ -29,49 +23,49 @@ const TASK_SEEDS: readonly TaskSeed[] = [
   {
     id: 'seed-t1',
     title: 'Entregar el ensayo de la Revolución Industrial',
-    subjectId: 'seed-hist',
+    subjectId: 's-soc',
     dueInDays: -3,
     priority: 'high',
   },
   {
     id: 'seed-t2',
     title: 'Ejercicios 4 y 5 de integrales',
-    subjectId: 'seed-mat',
+    subjectId: 's-mat',
     dueInDays: -1,
     priority: 'high',
   },
   {
     id: 'seed-t3',
     title: 'Leer el capítulo 7 antes del seminario',
-    subjectId: 'seed-hist',
+    subjectId: 's-soc',
     dueInDays: 0,
     priority: 'medium',
   },
   {
     id: 'seed-t4',
     title: 'Terminar la práctica de arrays y bucles',
-    subjectId: 'seed-prog',
+    subjectId: 's-com',
     dueInDays: 0,
     priority: 'medium',
   },
   {
     id: 'seed-t5',
     title: 'Informe de laboratorio: péndulo simple',
-    subjectId: 'seed-fis',
+    subjectId: 's-fis',
     dueInDays: 2,
     priority: 'high',
   },
   {
     id: 'seed-t6',
     title: 'Mesa de trabajo en grupo',
-    subjectId: 'seed-prog',
+    subjectId: 's-com',
     dueInDays: 4,
     priority: 'medium',
   },
   {
     id: 'seed-t7',
     title: 'Repasar EU1 para el parcial',
-    subjectId: 'seed-mat',
+    subjectId: 's-mat',
     dueInDays: 6,
     priority: 'high',
   },
@@ -85,7 +79,7 @@ const TASK_SEEDS: readonly TaskSeed[] = [
   {
     id: 'seed-t9',
     title: 'Mapa conceptual del Renacimiento',
-    subjectId: 'seed-hist',
+    subjectId: 's-soc',
     dueInDays: -5,
     priority: 'medium',
     done: true,
@@ -93,7 +87,7 @@ const TASK_SEEDS: readonly TaskSeed[] = [
   {
     id: 'seed-t10',
     title: 'Problema de fuerza y aceleración',
-    subjectId: 'seed-fis',
+    subjectId: 's-fis',
     dueInDays: -2,
     priority: 'medium',
     done: true,
@@ -117,7 +111,7 @@ const NOTE_SEEDS: ReadonlyArray<Omit<Note, 'createdAt' | 'updatedAt'>> = [
       'Ejemplo: d/dx (3x² + 2) = 6x',
       '```',
     ].join('\n'),
-    subjectId: 'seed-mat',
+    subjectId: 's-mat',
     tags: ['cálculo', 'parcial'],
     pinned: true,
   },
@@ -134,7 +128,7 @@ const NOTE_SEEDS: ReadonlyArray<Omit<Note, 'createdAt' | 'updatedAt'>> = [
       '',
       'En modo **zoneless** nada de esto salta solo: hay que actualizar un signal.',
     ].join('\n'),
-    subjectId: 'seed-prog',
+    subjectId: 's-com',
     tags: ['angular'],
     pinned: false,
   },
@@ -151,7 +145,7 @@ const NOTE_SEEDS: ReadonlyArray<Omit<Note, 'createdAt' | 'updatedAt'>> = [
       '',
       'Fechas clave: **1760** máquina de vapor, **1785** telar mecánico.',
     ].join('\n'),
-    subjectId: 'seed-hist',
+    subjectId: 's-soc',
     tags: ['tema-3', 'ensayo'],
     pinned: false,
   },
@@ -165,7 +159,7 @@ const NOTE_SEEDS: ReadonlyArray<Omit<Note, 'createdAt' | 'updatedAt'>> = [
       '- 2ª: F = m·a',
       '- 3ª: toda fuerza tiene reacción igual y opuesta',
     ].join('\n'),
-    subjectId: 'seed-fis',
+    subjectId: 's-fis',
     tags: ['mecánica'],
     pinned: false,
   },
@@ -196,5 +190,5 @@ export function buildSeedData(): SeedData {
     updatedAt: createdAt,
   }));
 
-  return { subjects: [...SUBJECTS], tasks, notes };
+  return { subjects: createDefaultSubjects(), tasks, notes };
 }
